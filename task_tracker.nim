@@ -1,6 +1,5 @@
-import std/[times, os]
+import std/[os]
 import std/json
-import std/files
 import std/strutils
 
 var
@@ -15,14 +14,14 @@ proc load_task(): string =
 proc add_task(task_name:string) =
   if not fileExists("./tasks.json"):
     var jsonTemplate = %*{
-       task_name: { "task_descp": "","task_due_date": false,"daily":false }
+       task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general" }
       }
     writeFile("tasks.json", $jsonTemplate)
   else:
     echo "hello"
     var jsonFile = readFile("tasks.json")
     var jsonNode = parseJson(jsonFile)
-    jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false}
+    jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false,"class":"general"}
     writeFile("tasks.json",$jsonNode)
 
 
