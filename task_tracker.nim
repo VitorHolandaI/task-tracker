@@ -59,32 +59,35 @@ proc syncro() =
  
 proc cli() =
  for arg in arguments:
-   echo len(arguments)
    case arg:
+     of "--help":
+       echo("--add-task taskName")
+       echo("--add-desc taskName taskDescrp")
+       echo("--add-due-date taskName dueDate(xx/xx/xxxx)")
+       echo("--set-daily taskName")
+       break
      of "--add-task":
-       echo("add a task")
        let task_name = arguments[1]
        add_task(task_name)
+       break
      of "--add-desc":
-       echo("add a task")
        let task_name = arguments[1]
        #let task_des = arg
        let task_desc = arguments[2 .. len(arguments) - 1]
        var descp = task_desc.join(" ")
        add_desc(task_name,descp)
+       break
      of "--add-due-date":
-      echo("add a task")
       let task_name = arguments[1]
       let date = arguments[2]
       set_due(task_name,date)
-      echo arguments[1]
+      break
      of "--set-daily":
       let task_name = arguments[1]
       set_daily(task_name)
-      echo("add a task")
-      echo arguments[1]
+      break
      else:
-       echo "Unrecognized letter"
+       echo "Not a command"
  
 
 syncro()
