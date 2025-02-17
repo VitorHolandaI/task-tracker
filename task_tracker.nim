@@ -1,4 +1,4 @@
-import std/[os]
+import std/[os,dirs]
 import std/json
 import std/strutils
 
@@ -24,7 +24,8 @@ proc add_task(task_name:string) =
     jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false,"class":"general","done":false}
     writeFile("tasks.json",$jsonNode)
 
-
+#type does not matter to overwrite in the json either way its translated to json object.....
+#need a proc modifyTask(task_name,variable,valuetoput)
 proc add_desc(task_name: string, descp: string) =
   var jsonFile = load_task()
   var JsonNode = parseJson(jsonFile)
@@ -41,18 +42,18 @@ proc set_due(task_name:string,date:string) =
   JsonNode[task_name] = node
   writeFile("tasks.json", $JsonNode)
 
- 
-
-
 proc set_daily(task_name:string) =
- echo "hello"
+  var jsonFile = load_task()
+  var JsonNode = parseJson(jsonFile)
+  var node = JsonNode[task_name]
+  node["daily"] = %true
+  JsonNode[task_name] = node
+  writeFile("tasks.json", $JsonNode)
 
 
  
 proc cli() =
  for arg in arguments:
-
-
    echo len(arguments)
    case arg:
      of "--add-task":
