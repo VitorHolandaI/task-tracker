@@ -12,8 +12,6 @@ sleep(500) # Replace this with something to be timed
 proc writeTask(task_name:string,node:JsonNode) =
   writeFile(fmt"./tasks/{task_name}.json", $node)
    
-proc task_checker() =
- echo "hell"
 proc load_task(task_name:string): string =
    let result = if not fileExists(fmt"./tasks/{task_name}.json"): "false" else: readFile(fmt"./tasks/{task_name}.json")
    result
@@ -33,7 +31,6 @@ proc add_desc(task_name: string, descp: string) =
   node["task_descp"] = %descp
   JsonNode[task_name] = node
   writeTask(task_name,JsonNode)
-#  writeFile("tasks.json", $JsonNode)
 
 proc set_due(task_name:string,date:string) =
   var jsonFile = load_task(task_name)
@@ -41,7 +38,7 @@ proc set_due(task_name:string,date:string) =
   var node = JsonNode[task_name]
   node["task_due_date"] = %date
   JsonNode[task_name] = node
-  writeFile("tasks.json", $JsonNode)
+  writeTask(task_name,JsonNode)
 
 proc set_daily(task_name:string) =
   var jsonFile = load_task(task_name)
@@ -49,7 +46,7 @@ proc set_daily(task_name:string) =
   var node = JsonNode[task_name]
   node["daily"] = %true
   JsonNode[task_name] = node
-  writeFile("tasks.json", $JsonNode)
+  writeTask(task_name,JsonNode)
 
 
 proc syncro() =
