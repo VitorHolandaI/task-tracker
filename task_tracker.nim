@@ -51,6 +51,13 @@ proc set_daily(task_name:string) =
   writeFile("tasks.json", $JsonNode)
 
 
+proc syncro() =
+  if not existsOrCreateDir("./tasks"):
+     echo "tasks does not exist creating..."
+  if not existsOrCreateDir("./done"):
+     echo "done does not exist creating..."
+  if not existsOrCreateDir("./failed"):
+     echo "failed does not exist creating..."
  
 proc cli() =
  for arg in arguments:
@@ -82,6 +89,7 @@ proc cli() =
        echo "Unrecognized letter"
  
 
+syncro()
 cli()
 
 #why not just load every thing in a struck the tasks and go with it ......
