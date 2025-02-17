@@ -1,41 +1,42 @@
 import std/[os,dirs]
 import std/json
 import std/strutils
+import std/strformat
+
 
 var
   arguments = commandLineParams()
 sleep(500) # Replace this with something to be timed
 
 
-proc load_task(): string =
-   let result = if not fileExists("./tasks.json"): "false" else: readFile("tasks.json")
+proc writeTask(task_name:string,node:JsonNode) =
+  writeFile(fmt"./tasks/{task_name}.json", $node)
+   
+proc task_checker() =
+ echo "hell"
+proc load_task(task_name:string): string =
+   let result = if not fileExists(fmt"./tasks/{task_name}.json"): "false" else: readFile(fmt"./tasks/{task_name}.json")
    result
 
 proc add_task(task_name:string) =
-  if not fileExists("./tasks.json"):
-    var jsonTemplate = %*{
+   var jsonTemplate = %*{
        task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general","done":false }
-      }
-    writeFile("tasks.json", $jsonTemplate)
-  else:
-    echo "hello"
-    var jsonFile = readFile("tasks.json")
-    var jsonNode = parseJson(jsonFile)
-    jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false,"class":"general","done":false}
-    writeFile("tasks.json",$jsonNode)
+   }
+   writeFile(fmt"./tasks/{task_name}.json", $jsonTemplate)
 
 #type does not matter to overwrite in the json either way its translated to json object.....
 #need a proc modifyTask(task_name,variable,valuetoput)
 proc add_desc(task_name: string, descp: string) =
-  var jsonFile = load_task()
+  var jsonFile = load_task(task_name)
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
   node["task_descp"] = %descp
   JsonNode[task_name] = node
-  writeFile("tasks.json", $JsonNode)
+  writeTask(task_name,JsonNode)
+#  writeFile("tasks.json", $JsonNode)
 
 proc set_due(task_name:string,date:string) =
-  var jsonFile = load_task()
+  var jsonFile = load_task(task_name)
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
   node["task_due_date"] = %date
@@ -43,7 +44,7 @@ proc set_due(task_name:string,date:string) =
   writeFile("tasks.json", $JsonNode)
 
 proc set_daily(task_name:string) =
-  var jsonFile = load_task()
+  var jsonFile = load_task(task_name)
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
   node["daily"] = %true
