@@ -7,21 +7,21 @@ var
 sleep(500) # Replace this with something to be timed
 
 
-proc load_task(): string = 
+proc load_task(): string =
    let result = if not fileExists("./tasks.json"): "false" else: readFile("tasks.json")
    result
 
 proc add_task(task_name:string) =
   if not fileExists("./tasks.json"):
     var jsonTemplate = %*{
-       task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general" }
+       task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general","done":false }
       }
     writeFile("tasks.json", $jsonTemplate)
   else:
     echo "hello"
     var jsonFile = readFile("tasks.json")
     var jsonNode = parseJson(jsonFile)
-    jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false,"class":"general"}
+    jsonNode[task_name] = %*{"task_desc":"","task_due_date":false,"daily":false,"class":"general","done":false}
     writeFile("tasks.json",$jsonNode)
 
 
@@ -30,11 +30,18 @@ proc add_desc(task_name: string, descp: string) =
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
   node["task_descp"] = %descp
-  JsonNode[task_name] = node  
+  JsonNode[task_name] = node
   writeFile("tasks.json", $JsonNode)
 
 proc set_due(task_name:string,date:string) =
- echo "hello"
+  var jsonFile = load_task()
+  var JsonNode = parseJson(jsonFile)
+  var node = JsonNode[task_name]
+  node["task_due_date"] = %date
+  JsonNode[task_name] = node
+  writeFile("tasks.json", $JsonNode)
+
+ 
 
 
 proc set_daily(task_name:string) =
@@ -42,7 +49,7 @@ proc set_daily(task_name:string) =
 
 
  
-proc cli() = 
+proc cli() =
  for arg in arguments:
 
 
@@ -67,7 +74,7 @@ proc cli() =
       echo arguments[1]
      of "--set-daily":
       let task_name = arguments[1]
-      set_daily(task_name) 
+      set_daily(task_name)
       echo("add a task")
       echo arguments[1]
      else:
