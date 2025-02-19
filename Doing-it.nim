@@ -48,7 +48,19 @@ proc set_daily(task_name:string) =
   JsonNode[task_name] = node
   writeTask(task_name,JsonNode)
 
-
+#what is a failed task?
+#a dayly task:? can be failed or not depends if u makerd
+#needs and can be dayly task, or task with  any due date thats passed...
+#need to classify based on current date... daiyly task thtas passed
+#daiyly --> yes,dayly tasks have one filed of number of dones...
+proc move_failed () =
+  if not existsOrCreateDir("./tasks"):
+     echo "tasks does not exist creating..."
+  if not existsOrCreateDir("./done"):
+     echo "done does not exist creating..."
+  if not existsOrCreateDir("./failed"):
+     echo "failed does not exist creating..."
+ 
 proc syncro() =
   if not existsOrCreateDir("./tasks"):
      echo "tasks does not exist creating..."
@@ -91,6 +103,7 @@ proc cli() =
  
 
 syncro()
+move_failed()
 cli()
 
 #why not just load every thing in a struck the tasks and go with it ......
