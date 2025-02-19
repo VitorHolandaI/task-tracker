@@ -1,5 +1,4 @@
-import std/[os,dirs]
-import std/json
+import std/[os,dirs,json,sequtils]
 import std/strutils
 import std/strformat
 
@@ -48,19 +47,38 @@ proc set_daily(task_name:string) =
   JsonNode[task_name] = node
   writeTask(task_name,JsonNode)
 
+proc list() =
+   for file in walkFiles("./tasks/*.json"):
+      var task_name = file.split('/')[2].split('.')[0]
+      var jsonFile = load_task(task_name)
+      var JsonNode = parseJson(jsonFile)
+      var node = JsonNode[task_name]
+      var daily = node["daily"]
+      var due_date = node["task_due_date"]
+      var class = node["class"]
+      var descp = node["task_descp"]
+      echo (fmt"task name: {task_name}")
+      echo (fmt"task due date: {due_date}")
+      echo (fmt"task daily: {daily}")
+      echo (fmt"task class: {class}")
+      echo (fmt"task description: {descp}")
+      #var node = JsonNode[task_name]
+
+
+
 #what is a failed task?
 #a dayly task:? can be failed or not depends if u makerd
 #needs and can be dayly task, or task with  any due date thats passed...
 #need to classify based on current date... daiyly task thtas passed
 #daiyly --> yes,dayly tasks have one filed of number of dones...
-proc move_failed () =
-  if not existsOrCreateDir("./tasks"):
-     echo "tasks does not exist creating..."
-  if not existsOrCreateDir("./done"):
-     echo "done does not exist creating..."
-  if not existsOrCreateDir("./failed"):
-     echo "failed does not exist creating..."
- 
+#proc move_failed () =
+#  if not existsOrCreateDir("./tasks"):
+#     echo "tasks does not exist creating..."
+#  if not existsOrCreateDir("./done"):
+#     echo "done does not exist creating..."
+#  if not existsOrCreateDir("./failed"):
+#     echo "failed does not exist creating..."
+# 
 proc syncro() =
   if not existsOrCreateDir("./tasks"):
      echo "tasks does not exist creating..."
@@ -77,6 +95,7 @@ proc cli() =
        echo("--add-desc taskName taskDescrp")
        echo("--add-due-date taskName dueDate(xx/xx/xxxx)")
        echo("--set-daily taskName")
+       echo("--list")
        break
      of "--add-task":
        let task_name = arguments[1]
@@ -98,12 +117,16 @@ proc cli() =
       let task_name = arguments[1]
       set_daily(task_name)
       break
+     of "--list":
+      list()
+      break
+
      else:
        echo "Not a command"
  
 
 syncro()
-move_failed()
+#move_failed()
 cli()
 
 #why not just load every thing in a struck the tasks and go with it ......
