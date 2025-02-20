@@ -16,7 +16,7 @@ jobs:
           - macOS-13
           - windows-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - uses: iffy/install-nim@v5
       with:
@@ -25,10 +25,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Compile Nim file
-      run: nim c -d:release -o:Doin Doin.nim
+      run: nim c -d:release -o:File File.nim
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: File-${{ matrix.os }}
         path: File*
