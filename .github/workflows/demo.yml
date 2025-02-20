@@ -1,8 +1,9 @@
-name: Nim CI
+name: Nim CI & Release
 
 on:
-  pull_request:
   push:
+    tags:
+      - "v*"  # Triggers only when a tag like v1.0, v2.3 is pushed
 
 jobs:
   build:
@@ -27,8 +28,32 @@ jobs:
     - name: Compile Nim file
       run: nim c -d:release -o:Doin Doin.nim
 
+    - name: Rename binary for OS
+      run: |
+        mv Doin Doin-${{ matrix.os }}
+      shell: bash
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: File-${{ matrix.os }}
-        path: File*
+        name: Doin-${{ matrix.os }}
+        path: Doin-${{ matrix.os }}
+
+  release:
+    needs: build  # Waits for the build job to finish
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all built binaries
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: artifacts/Doin-*
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generate_release_notes: true
+
