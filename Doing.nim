@@ -2,6 +2,7 @@ import std/[os,dirs,json,sequtils]
 import std/strutils
 import std/strformat
 
+let home = getHomeDir()
 
 var
   arguments = commandLineParams()
@@ -9,17 +10,20 @@ sleep(500) # Replace this with something to be timed
 
 
 proc writeTask(task_name:string,node:JsonNode) =
-  writeFile(fmt"./tasks/{task_name}.json", $node)
+  let home = getHomeDir()
+  writeFile(fmt"{home}/.tasks/tasks/{task_name}.json", $node)
    
 proc load_task(task_name:string): string =
-   let result = if not fileExists(fmt"./tasks/{task_name}.json"): "false" else: readFile(fmt"./tasks/{task_name}.json")
+   let home = getHomeDir()
+   let result = if not fileExists(fmt"{home}/.tasks/tasks/{task_name}.json"): "false" else: readFile(fmt"{home}/.tasks/tasks/{task_name}.json")
    result
 
 proc add_task(task_name:string) =
+   let home = getHomeDir()
    var jsonTemplate = %*{
        task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general","done":false }
    }
-   writeFile(fmt"./tasks/{task_name}.json", $jsonTemplate)
+   writeFile(fmt"{home}/.tasks/tasks/{task_name}.json", $jsonTemplate)
 
 #type does not matter to overwrite in the json either way its translated to json object.....
 #need a proc modifyTask(task_name,variable,valuetoput)
@@ -48,8 +52,9 @@ proc set_daily(task_name:string) =
   writeTask(task_name,JsonNode)
 
 proc list() =
-   for file in walkFiles("./tasks/*.json"):
-      var task_name = file.split('/')[2].split('.')[0]
+   let home = getHomeDir()
+   for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
+      var task_name = file.split("/")[5].split('.')[0]
       var jsonFile = load_task(task_name)
       var JsonNode = parseJson(jsonFile)
       var node = JsonNode[task_name]
@@ -80,11 +85,14 @@ proc list() =
 #     echo "failed does not exist creating..."
 # 
 proc syncro() =
-  if not existsOrCreateDir("./tasks"):
+  let home = getHomeDir()
+  if not existsOrCreateDir(fmt"{home}/.tasks"):
      echo "tasks does not exist creating..."
-  if not existsOrCreateDir("./done"):
+  if not existsOrCreateDir(fmt"{home}/.tasks/tasks"):
+     echo "tasks does not exist creating..."
+  if not existsOrCreateDir(fmt"{home}/.tasks/done"):
      echo "done does not exist creating..."
-  if not existsOrCreateDir("./failed"):
+  if not existsOrCreateDir(fmt"{home}/.tasks/failed"):
      echo "failed does not exist creating..."
  
 proc cli() =
