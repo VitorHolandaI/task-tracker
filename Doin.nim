@@ -10,21 +10,21 @@ sleep(500) # Replace this with something to be timed
 
 proc load_task(task_name:string): string =
    let home = getHomeDir()
-   let result = if not fileExists(fmt"{home}/.tasks/tasks/{task_name}.json"): "false" else: readFile(fmt"{home}/.tasks/tasks/{task_name}.json")
+   let result = if not fileExists(fmt"{home}.tasks/tasks/{task_name}.json"): "false" else: readFile(fmt"{home}.tasks/tasks/{task_name}.json")
    result
 
 
-proc writeTask(task_name:string,node:JsonNode) =
+proc writeTask(task_name:string,node:string) =
   let home = getHomeDir()
-  writeFile(fmt"{home}/.tasks/tasks/{task_name}.json", $node)
+  writeFile(fmt"{home}.tasks/tasks/{task_name}.json", $node)
  
 proc writeTaskDone(task_name:string,node:JsonNode) =
   let home = getHomeDir()
-  writeFile(fmt"{home}/.tasks/done/{task_name}.json", $node)
+  writeFile(fmt"{home}.tasks/done/{task_name}.json", $node)
  
 proc excludeTask(task_name:string) =
   let home = getHomeDir()
-  removeFile(fmt"{home}/.tasks/tasks/{task_name}.json")
+  removeFile(fmt"{home}.tasks/tasks/{task_name}.json")
  
 
 proc setDone(task_name:string) =
@@ -36,7 +36,7 @@ proc setDone(task_name:string) =
   if node["daily"].getBool() == true:
      node["count"] = %(node["count"].getInt() + 1)
      writeTaskDone(task_name,JsonNode)
-     writeTask(task_name,JsonNode)
+     writeTask(task_name,$JsonNode)
      
   else:
     writeTaskDone(task_name,JsonNode)
@@ -47,7 +47,7 @@ proc add_task(task_name:string) =
    var jsonTemplate = %*{
        task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general","done":false,"count":0 }
    }
-   writeFile(fmt"{home}/.tasks/tasks/{task_name}.json", $jsonTemplate)
+   writeFile(fmt"{home}.tasks/tasks/{task_name}.json", $jsonTemplate)
 
 proc add_desc(task_name: string, descp: string) =
   var jsonFile = load_task(task_name)
@@ -55,7 +55,7 @@ proc add_desc(task_name: string, descp: string) =
   var node = JsonNode[task_name]
   node["task_descp"] = %descp
   JsonNode[task_name] = node
-  writeTask(task_name,JsonNode)
+  writeTask(task_name,$JsonNode)
 
 proc set_due(task_name:string,date:string) =
   var jsonFile = load_task(task_name)
@@ -63,7 +63,7 @@ proc set_due(task_name:string,date:string) =
   var node = JsonNode[task_name]
   node["task_due_date"] = %date
   JsonNode[task_name] = node
-  writeTask(task_name,JsonNode)
+  writeTask(task_name,$JsonNode)
 
 proc set_daily(task_name:string) =
   var jsonFile = load_task(task_name)
@@ -72,7 +72,7 @@ proc set_daily(task_name:string) =
   node["daily"] = %true
   node["count"] = %0
   JsonNode[task_name] = node
-  writeTask(task_name,JsonNode)
+  writeTask(task_name,$JsonNode)
 
 proc list() =
    let home = getHomeDir()
@@ -148,7 +148,8 @@ proc cli() =
       setDone(arguments[1])
       break
      else:
-       echo "Not a command"
+      echo "Not a command"
+      break
  
 
 syncro()
