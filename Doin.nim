@@ -43,21 +43,16 @@ proc setDone(task_name:string) =
      writeTask(task_name,$JsonNode)
      
   else:
-    if node["task_due_date"].getBool() == false:
-       echo "is a Due task"
+    if node["task_due_date"].getBool() != false:
        let now = now()
        let set_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
-       echo set_date
-       echo now
        if (now >= set_date):
-          echo "the set date is lower than the now date"
           writeTaskOverdue(task_name,JsonNode)
           excludeTask(task_name)
        else:
           writeTaskDone(task_name,JsonNode)
           excludeTask(task_name)
     else:
-       echo "is not a Due task"
        writeTaskDone(task_name,JsonNode)
        excludeTask(task_name)
 
