@@ -1,4 +1,4 @@
-import std/[os,dirs,json,sequtils]
+import std/[os,dirs,json,sequtils,times]
 import std/strutils
 import std/strformat
 
@@ -22,6 +22,10 @@ proc writeTaskDone(task_name:string,node:JsonNode) =
   let home = getHomeDir()
   writeFile(fmt"{home}.tasks/done/{task_name}.json", $node)
  
+proc writeTaskOverdue(task_name:string,node:JsonNode) =
+  let home = getHomeDir()
+  writeFile(fmt"{home}.tasks/overdue/{task_name}.json", $node)
+ 
 proc excludeTask(task_name:string) =
   let home = getHomeDir()
   removeFile(fmt"{home}.tasks/tasks/{task_name}.json")
@@ -39,8 +43,24 @@ proc setDone(task_name:string) =
      writeTask(task_name,$JsonNode)
      
   else:
-    writeTaskDone(task_name,JsonNode)
-    excludeTask(task_name)
+    if node["task_due_date"].getBool() == false:
+       echo "is a Due task"
+       let now = now()
+       let set_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
+       echo set_date
+       echo now
+       if (now >= set_date):
+          echo "the set date is lower than the now date"
+          writeTaskOverdue(task_name,JsonNode)
+          excludeTask(task_name)
+       else:
+          writeTaskDone(task_name,JsonNode)
+          excludeTask(task_name)
+    else:
+       echo "is not a Due task"
+       writeTaskDone(task_name,JsonNode)
+       excludeTask(task_name)
+
 
 proc add_task(task_name:string) =
    let home = getHomeDir()
@@ -110,14 +130,17 @@ proc syncro() =
      echo "done does not exist creating..."
   if not existsOrCreateDir(fmt"{home}/.tasks/failed"):
      echo "failed does not exist creating..."
- 
+  if not existsOrCreateDir(fmt"{home}/.tasks/overdue"):
+     echo "overdue does not exist creating..."
+
+
 proc cli() =
  for arg in arguments:
    case arg:
      of "--help":
        echo("--add-task taskName")
        echo("--add-desc taskName taskDescrp")
-       echo("--due-date taskName xx/xx/xxxx")
+       echo("--due-date taskName dd-MM-yyyy")
        echo("--daily taskName")
        echo("--done taskName")
        echo("--list")
