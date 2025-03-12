@@ -92,7 +92,9 @@ proc set_daily(task_name:string) =
 proc list() =
    let home = getHomeDir()
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
-      var task_name = file.split("/")[5].split('.')[0]
+      var task_name = file.split("/")[5].split(".json")[0]
+      echo task_name
+
       var jsonFile = load_task(task_name)
       var JsonNode = parseJson(jsonFile)
       var node = JsonNode[task_name]
