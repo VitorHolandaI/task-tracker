@@ -144,6 +144,9 @@ proc cli() =
      of "--add-task":
        let task_name = arguments[1]
        add_task(task_name)
+       if (arguments.len > 2):
+          let date = arguments[2]
+          set_due(task_name,date)
        break
      of "--add-desc":
        let task_name = arguments[1]
