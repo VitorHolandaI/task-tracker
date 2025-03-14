@@ -88,7 +88,7 @@ proc set_daily(task_name:string) =
   node["count"] = %0
   JsonNode[task_name] = node
   writeTask(task_name,$JsonNode)
-
+proc yellow*(s: string): string = "\e[33m" & s & "\e[0m"
 proc list() =
    let home = getHomeDir()
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
@@ -102,7 +102,8 @@ proc list() =
       var descp = node["task_descp"]
       var done = node["done"]
       echo ("---------------------------")
-      echo (fmt"task name: {task_name}")
+      echo (fmt"task name: {task_name}".yellow)
+
       echo (fmt"task due date: {due_date}")
       echo (fmt"task daily: {daily}")
       echo (fmt"task class: {class}")
@@ -143,6 +144,9 @@ proc cli() =
      of "--add-task":
        let task_name = arguments[1]
        add_task(task_name)
+       if (arguments.len > 2):
+          let date = arguments[2]
+          set_due(task_name,date)
        break
      of "--add-desc":
        let task_name = arguments[1]
