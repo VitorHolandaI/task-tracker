@@ -43,7 +43,7 @@ proc setDone(task_name:string) =
      writeTask(task_name,$JsonNode)
      
   else:
-    if node["task_due_date"].getBool() != false:
+    if node["task_due_date"].getStr() != "":
        let now = now()
        let set_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
        if (now >= set_date):
@@ -56,11 +56,28 @@ proc setDone(task_name:string) =
        writeTaskDone(task_name,JsonNode)
        excludeTask(task_name)
 
+proc list_close(task_nnme:string,time:int) =
+   let home = getHomeDir()
+   for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
+      var task_name = file.split("/")[5].split(".json")[0]
+      var jsonFile = load_task(task_name)
+      var JsonNode = parseJson(jsonFile)
+      var node = JsonNode[task_name]
+      if (node["task_due_date"].getStr() != ""):
+          #get curret value
+          #split the values to get the days
+          #add the values to the day
+          #convert it back
+          #to date time with arse
+          #if the final date is bigger then the due date display it if not dont :)
+          echo parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
+          let now = now()
+          echo fmt" now is {now}"
 
 proc add_task(task_name:string) =
    let home = getHomeDir()
    var jsonTemplate = %*{
-       task_name: { "task_descp": "","task_due_date": false,"daily":false,"class":"general","done":false,"count":0 }
+       task_name: { "task_descp": "","task_due_date": "","daily":false,"class":"general","done":false,"count":0 }
    }
    writeFile(fmt"{home}.tasks/tasks/{task_name}.json", $jsonTemplate)
 
@@ -166,6 +183,10 @@ proc cli() =
      of "--list":
       list()
       break
+     of "--list-close":
+      list_close("hello",1)
+      break
+
      of "--done":
       setDone(arguments[1])
       break
