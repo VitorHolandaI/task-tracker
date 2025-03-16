@@ -68,7 +68,7 @@ proc setDone(task_name:string) =
        writeTaskDone(task_name,JsonNode)
        excludeTask(task_name)
 
-proc list_close(task_nnme:string,time:string) =
+proc list_close(time:string) =
    let home = getHomeDir()
    let time = parseInt(time)
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
@@ -214,7 +214,7 @@ proc cli() =
       list()
       break
      of "--list-close":
-      list_close("hello",arguments[1])
+      list_close(arguments[1])
       break
 
      of "--done":
