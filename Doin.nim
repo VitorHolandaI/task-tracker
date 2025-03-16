@@ -38,9 +38,20 @@ proc setDone(task_name:string) =
   node["done"] = %true
   JsonNode[task_name] = node
   if node["daily"].getBool() == true:
-     node["count"] = %(node["count"].getInt() + 1)
-     writeTaskDone(task_name,JsonNode)
-     writeTask(task_name,$JsonNode)
+     echo "is this even true"
+     let task_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
+     if (format(now(),"dd") > format(task_date,"dd")):
+        node["notDoneCount"] = %(node["notDoneCount"].getInt() + 1)
+        var now = format(now() + 1.days,"dd-MM-YYYY")
+        node["task_due_date"] = %now
+        writeTask(task_name,$JsonNode)
+
+     else:
+        node["DoneCount"] = %(node["DoneCount"].getInt() + 1)
+        var now = format(now() + 1.days,"dd-MM-YYYY")
+        node["task_due_date"] = %now
+        writeTaskDone(task_name,JsonNode)
+        writeTask(task_name,$JsonNode)
      
   else:
     if node["task_due_date"].getStr() != "":
@@ -101,8 +112,11 @@ proc set_daily(task_name:string) =
   var jsonFile = load_task(task_name)
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
+  var now = format(now(),"dd-MM-YYYY")
+  node["task_due_date"] = %now
   node["daily"] = %true
-  node["count"] = %0
+  node["DoneCount"] = %0
+  node["notDoneCount"] = %0
   JsonNode[task_name] = node
   writeTask(task_name,$JsonNode)
 proc yellow*(s: string): string = "\e[33m" & s & "\e[0m"
@@ -127,8 +141,10 @@ proc list() =
       echo (fmt"task description: {descp}")
       echo (fmt"Done? {done}")
       if (daily == true):
-         var doneCount = node["count"]
+         var doneCount = node["DoneCount"]
+         var notdoneCount = node["notDoneCount"]
          echo (fmt"Done count.... {doneCount}")
+         echo (fmt"Not Done count.... {notdoneCount}")
       echo ("---------------------------")
       #var node = JsonNode[task_name]
 
