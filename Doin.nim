@@ -8,6 +8,7 @@ var
   arguments = commandLineParams()
 sleep(500) # Replace this with something to be timed
 
+proc yellow*(s: string): string = "\e[33m" & s & "\e[0m"
 proc load_task(task_name:string): string =
    let home = getHomeDir()
    let result = if not fileExists(fmt"{home}.tasks/tasks/{task_name}.json"): "false" else: readFile(fmt"{home}.tasks/tasks/{task_name}.json")
@@ -67,24 +68,38 @@ proc setDone(task_name:string) =
        writeTaskDone(task_name,JsonNode)
        excludeTask(task_name)
 
-proc list_close(task_nnme:string,time:int) =
+proc list_close(task_nnme:string,time:string) =
    let home = getHomeDir()
+   let time = parseInt(time)
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
       var task_name = file.split("/")[5].split(".json")[0]
       var jsonFile = load_task(task_name)
       var JsonNode = parseJson(jsonFile)
       var node = JsonNode[task_name]
       if (node["task_due_date"].getStr() != ""):
-          #get curret value
-          #split the values to get the days
-          #add the values to the day
-          #convert it back
-          #to date time with arse
-          #if the final date is bigger then the due date display it if not dont :)
-          echo parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
-          let now = now()
-          echo fmt" now is {now}"
+          let task_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
+          let now = now() + time.days
+          if (now <= task_date):
+             var daily = node["daily"].getBool()
+             var due_date = node["task_due_date"]
+             var class = node["class"]
+             var descp = node["task_descp"]
+             var done = node["done"]
+             echo ("---------------------------")
+             echo (fmt"task name: {task_name}".yellow)
 
+             echo (fmt"task due date: {due_date}")
+             echo (fmt"task daily: {daily}")
+             echo (fmt"task class: {class}")
+             echo (fmt"task description: {descp}")
+             echo (fmt"Done? {done}")
+             if (daily == true):
+                var doneCount = node["DoneCount"]
+                var notdoneCount = node["notDoneCount"]
+                echo (fmt"Done count.... {doneCount}")
+                echo (fmt"Not Done count.... {notdoneCount}")
+             echo ("---------------------------")
+ 
 proc add_task(task_name:string) =
    let home = getHomeDir()
    var jsonTemplate = %*{
@@ -119,7 +134,6 @@ proc set_daily(task_name:string) =
   node["notDoneCount"] = %0
   JsonNode[task_name] = node
   writeTask(task_name,$JsonNode)
-proc yellow*(s: string): string = "\e[33m" & s & "\e[0m"
 proc list() =
    let home = getHomeDir()
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
@@ -200,7 +214,7 @@ proc cli() =
       list()
       break
      of "--list-close":
-      list_close("hello",1)
+      list_close("hello",arguments[1])
       break
 
      of "--done":
