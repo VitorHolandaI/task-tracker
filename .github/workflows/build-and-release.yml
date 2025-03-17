@@ -1,0 +1,36 @@
+name: Nim CI
+
+on:
+  push:
+    tags:
+      - 'v*'  # This will trigger the workflow when a tag like v1.0 is pushed.
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        nimversion:
+          - binary:stable
+        os:
+          - ubuntu-latest
+          - macOS-13
+          - windows-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: iffy/install-nim@v5
+      with:
+        version: ${{ matrix.nimversion }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Compile Nim file
+      run: nim c -d:release -o:Doin Doin.nim
+
+    - name: Create Release and Upload Binary
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Doin  # Path to the compiled binary
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
