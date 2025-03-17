@@ -70,7 +70,7 @@ proc setDone(task_name:string) =
 
 proc list_close(time:string) =
    let home = getHomeDir()
-   let time = parseInt(time)
+   let time = parseInt(time) - 1
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
       var task_name = file.split("/")[5].split(".json")[0]
       var jsonFile = load_task(task_name)
