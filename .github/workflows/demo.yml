@@ -27,8 +27,9 @@ jobs:
     - name: Compile Nim file
       run: nim c -d:release -o:Doin Doin.nim
 
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: File-${{ matrix.os }}
-        path: File*
+        name: Doin-${{ matrix.os }}
+        path: Doin
