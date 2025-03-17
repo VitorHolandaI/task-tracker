@@ -70,7 +70,7 @@ proc setDone(task_name:string) =
 
 proc list_close(time:string) =
    let home = getHomeDir()
-   let time = parseInt(time) - 1
+   let time = parseInt(time)
    for file in walkFiles(fmt"{home}.tasks/tasks/*.json"):
       var task_name = file.split("/")[5].split(".json")[0]
       var jsonFile = load_task(task_name)
@@ -79,7 +79,7 @@ proc list_close(time:string) =
       if (node["task_due_date"].getStr() != ""):
           let task_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
           let now = now() + time.days
-          if (now <= task_date):
+          if (task_date.toTime <= now.toTime):
              var daily = node["daily"].getBool()
              var due_date = node["task_due_date"]
              var class = node["class"]
