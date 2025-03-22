@@ -9,6 +9,7 @@ var
 sleep(500) # Replace this with something to be timed
 
 proc yellow*(s: string): string = "\e[33m" & s & "\e[0m"
+proc red*(s: string): string = "\e[1m" & s & "\e[0m"
 proc load_task(task_name:string): string =
    let home = getHomeDir()
    let result = if not fileExists(fmt"{home}.tasks/tasks/{task_name}.json"): "false" else: readFile(fmt"{home}.tasks/tasks/{task_name}.json")
@@ -88,7 +89,7 @@ proc list_close(time:string) =
              echo ("---------------------------")
              echo (fmt"task name: {task_name}".yellow)
 
-             echo (fmt"task due date: {due_date}")
+             echo (fmt"task due date: {due_date}".red)
              echo (fmt"task daily: {daily}")
              echo (fmt"task class: {class}")
              echo (fmt"task description: {descp}")
