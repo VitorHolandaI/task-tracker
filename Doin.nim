@@ -188,6 +188,7 @@ proc cli() =
        echo("--daily taskName")
        echo("--done taskName")
        echo("--list")
+       echo("--list-close nDays")
        break
      of "--add-task":
        let task_name = arguments[1]
