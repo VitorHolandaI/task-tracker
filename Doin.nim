@@ -37,20 +37,20 @@ proc setDone(task_name:string) =
   var jsonFile = load_task(task_name)
   var JsonNode = parseJson(jsonFile)
   var node = JsonNode[task_name]
-  node["done"] = %true
+  node["done"] = %("This task was done at " & format(now(),"dd/MM/yyyy--HH:mm:ss"))
   JsonNode[task_name] = node
   if node["daily"].getBool() == true:
      echo "is this even true"
      let task_date = parse(node["task_due_date"].getStr(),"dd-MM-yyyy")
      if (format(now(),"dd") > format(task_date,"dd")):
         node["notDoneCount"] = %(node["notDoneCount"].getInt() + 1)
-        var now = format(now(),"dd-MM-YYYY")
+        var now = format(now() + 1.days,"dd-MM-YYYY")
         node["task_due_date"] = %now
         writeTask(task_name,$JsonNode)
 
      else:
         node["DoneCount"] = %(node["DoneCount"].getInt() + 1)
-        var now = format(now(),"dd-MM-YYYY")
+        var now = format(now() + 1.days,"dd-MM-YYYY")
         node["task_due_date"] = %now
         writeTaskDone(task_name,JsonNode)
         writeTask(task_name,$JsonNode)
