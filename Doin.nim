@@ -101,6 +101,7 @@ proc list_close(time:string) =
                 echo (fmt"Not Done count.... {notdoneCount}")
              echo ("---------------------------")
  
+
 proc add_task(task_name:string) =
    let home = getHomeDir()
    var jsonTemplate = %*{
@@ -189,6 +190,7 @@ proc cli() =
        echo("--done taskName")
        echo("--list")
        echo("--list-close nDays")
+       echo("--list-today")
        break
      of "--add-task":
        let task_name = arguments[1]
@@ -218,7 +220,9 @@ proc cli() =
      of "--list-close":
       list_close(arguments[1])
       break
-
+     of "--list-today":
+      list_close("0")
+      break
      of "--done":
       setDone(arguments[1])
       break
